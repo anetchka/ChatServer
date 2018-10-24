@@ -1,8 +1,11 @@
 package chatServer;
 
+import java.util.List;
+
 public class User {
 	private String userName;
 	private String password;
+	private List<Chat> userChats;
 	
 	/**
 	 * Constructor
@@ -28,5 +31,13 @@ public class User {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public List<Chat> getUsersChat() {
+		return userChats;
+	}
+
+	public void setUsersChat(List<Chat> usersChat) {
+		this.userChats = usersChat;
 	}
 }
