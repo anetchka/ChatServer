@@ -7,7 +7,8 @@ public class Chat {
 	private String chatName;
 	private User admin;
 	private List <User> chatMembers;
-	private List<String> chatMessages;
+	private List<ChatMessage> chatMessages;
+	
 	public Chat(String chatName, User admin, List<User> chatMembers) {
 		super();
 		this.chatName = chatName;
@@ -32,13 +33,10 @@ public class Chat {
 	public void setChatMembers(List<User> chatMembers) {
 		this.chatMembers = chatMembers;
 	}
-	public List<String> getChatMessages() {
+	public List<ChatMessage> getChatMessages() {
 		return chatMessages;
 	}
-	public void setChatMessages(List<String> chatMessages) {
+	public void setChatMessages(List<ChatMessage> chatMessages) {
 		this.chatMessages = chatMessages;
 	}
-	
-	
-	
 }
