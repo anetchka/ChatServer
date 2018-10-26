@@ -3,6 +3,7 @@ package chatServer;
 import java.util.List;
 
 public class User {
+	private String id;
 	private String userName;
 	private String password;
 	private List<Chat> userChats;
@@ -39,5 +40,13 @@ public class User {
 
 	public void setUsersChat(List<Chat> usersChat) {
 		this.userChats = usersChat;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 }
