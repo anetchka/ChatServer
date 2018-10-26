@@ -36,28 +36,28 @@ public class InsertUserStep {
 	}
 	
 	@Given("the username \"(.*)\" doesn't exist in the chat")
-	public void the_username_doesn_t_exist_in_the_chat(String string) {
-	    assertNull(myDb.findUserByName(string));
+	public void the_username_doesn_t_exist_in_the_chat(String username) {
+	    assertNull(myDb.findUserByName(username));
 	}
 
 	@When("the user registers with username \"(.*)\" and password \"(.*)\"")
-	public void the_user_registers_with_username_and_password(String string, String string2) {
-	    myDb.registerUser(string, string2);
+	public void the_user_registers_with_username_and_password(String username, String password) {
+	    myDb.registerUser(username, password);
 	}
 
 	@Then("the server conformation with username \"(.*)\" and password \"(.*)\"")
-	public void the_server_conformation_with_username_and_password(String string, String string2) {
-	    myDb.saveUser(string, string2);
-	    assertNotNull(myDb.findUserByName(string));
+	public void the_server_conformation_with_username_and_password(String username, String password) {
+	    myDb.saveUser(username, password);
+	    assertNotNull(myDb.findUserByName(username));
 	}
 	
 	@Given("the username \"(.*)\" exists in the chat")
-	public void the_username_exists_in_the_chat(String string) {
-		assertNotNull(myDb.findUserByName(string));
+	public void the_username_exists_in_the_chat(String username) {
+		assertNotNull(myDb.findUserByName(username));
 	}
 
 	@Then("the server asks to enter a new username \"(.*)\" and  password \"(.*)\"")
-	public void the_server_asks_to_enter_a_new_username_and_password(String string, String string2) {
-		assertFalse(myDb.registerUser(string, string2));
+	public void the_server_asks_to_enter_a_new_username_and_password(String username, String password) {
+		assertFalse(myDb.registerUser(username, password));
 	}
 }

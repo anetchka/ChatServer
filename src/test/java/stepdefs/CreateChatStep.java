@@ -34,35 +34,35 @@ public class CreateChatStep {
 		}
 	}
 		@Given("the chat name \"(.*)\" is not in user's list \"(.*)\"")
-		public void the_chat_name_is_not_in_user_s_list(String string, String string2) {
-			myDb.saveUser(string2, "1234");
-			assertFalse(myDb.isChatInTheList(string2, string));
+		public void the_chat_name_is_not_in_user_s_list(String chat, String username) {
+			myDb.saveUser(username, "1234");
+			assertFalse(myDb.isChatInTheList(username, chat));
 		}
 
 		@When("the user \"(.*)\" wants to create the chat \"(.*)\"")
-		public void the_user_wants_to_create_the_chat(String string, String string2) {
-			myDb.createChat(string, string2);
+		public void the_user_wants_to_create_the_chat(String username, String chat) {
+			myDb.createChat(username, chat);
 		}
 
 		@Then("the user \"(.*)\" creates the chat \"(.*)\"")
-		public void the_user_creates_the_chat(String string, String string2) {
-			assertTrue(myDb.isChatInTheList(string, string2));
+		public void the_user_creates_the_chat(String username, String chat) {
+			assertTrue(myDb.isChatInTheList(username, chat));
 		}
 
 		@Then("the user \"(.*)\" is the admin of the chat \"(.*)\"")
-		public void the_user_is_the_admin_of_the_chat(String string, String string2) {
-			assertTrue(myDb.isAdmin(string, string2));
+		public void the_user_is_the_admin_of_the_chat(String username, String chat) {
+			assertTrue(myDb.isAdmin(username, chat));
 		}
 
 		@Given("the chat name \"(.*)\" is in  user's list \"(.*)\"")
-		public void the_chat_name_is_in_user_s_list(String string, String string2) {
-			assertTrue(myDb.isChatInTheList(string2, string));
+		public void the_chat_name_is_in_user_s_list(String chat, String username) {
+			assertTrue(myDb.isChatInTheList(username, chat));
 		}
 
 		@Then("the user \"(.*)\" is asked to use another chatname \"(.*)\"")
-		public void the_user_is_asked_to_use_another_chatname(String string, String string2) {
-			myDb.createChat(string, string2);
-			assertTrue(myDb.isChatInTheList(string, string2));
+		public void the_user_is_asked_to_use_another_chatname(String username, String chat) {
+			myDb.createChat(username, chat);
+			assertTrue(myDb.isChatInTheList(username, chat));
 		}
 
 }

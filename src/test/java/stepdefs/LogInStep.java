@@ -37,29 +37,29 @@ public class LogInStep {
 	}
 	
 	@Given("the username \"(.*)\" exists in db")
-	public void the_username_exists_in_db(String string) {
-		myDb.saveUser(string, "1234");
-		assertNotNull(myDb.findUserByName(string));
+	public void the_username_exists_in_db(String username) {
+		myDb.saveUser(username, "1234");
+		assertNotNull(myDb.findUserByName(username));
 	}
 
 	@When("the username \"(.*)\" and password \"(.*)\" match")
-	public void the_username_and_password_match(String string, String string2) {
-		assertTrue(myDb.validateLogin(string, string2));
+	public void the_username_and_password_match(String username, String password) {
+		assertTrue(myDb.validateLogin(username, password));
 	}
 	
 	
 	@Then("the user \"(.*)\" is online")
-	public void the_user_is_online(String string) {
-		assertEquals(myDb.getUserStatus(string), 1);
+	public void the_user_is_online(String username) {
+		assertEquals(myDb.getUserStatus(username), 1);
 	}
 	
 	@When("the username \"(.*)\" and password \"(.*)\" don't match")
-	public void the_username_and_password_don_t_match(String string, String string2) {
-		assertFalse(myDb.validateLogin(string, string2));
+	public void the_username_and_password_don_t_match(String username, String password) {
+		assertFalse(myDb.validateLogin(username, password));
 	}
 	
 	@Then("the user \"(.*)\" is offline")
-	public void the_user_is_offline(String string) {
-		assertEquals(myDb.getUserStatus(string), 0);
+	public void the_user_is_offline(String username) {
+		assertEquals(myDb.getUserStatus(username), 0);
 	}
 }
