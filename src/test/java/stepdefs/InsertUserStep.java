@@ -13,22 +13,22 @@ import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
-import database.MyDb;
+import serverChat.MyServer;
 
 public class InsertUserStep {
 
-	MyDb myDb = new MyDb();
+	MyServer myDb = new MyServer();
 	
 	@Before("@First")
 	@After("@Last")
 	public void cleanDB() {
 		
-		MongoCursor<Document> cursor = MyDb.collection.find().iterator();
+		MongoCursor<Document> cursor = MyServer.collection.find().iterator();
 		try {
 		    while (cursor.hasNext()) {
 		        Document doc = cursor.next();
 		        System.out.println(doc.toString());
-		        MyDb.collection.deleteOne(doc);
+		        MyServer.collection.deleteOne(doc);
 		    }
 		} finally {
 		    cursor.close();

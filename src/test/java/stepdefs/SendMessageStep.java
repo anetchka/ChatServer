@@ -13,33 +13,33 @@ import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
-import database.MyDb;
+import serverChat.MyServer;
 
 public class SendMessageStep {
 
-	MyDb myDb = new MyDb();
+	MyServer myDb = new MyServer();
 
 	@Before("@First")
 	@After("@Last")
 	public void cleanDB() {
 
-		MongoCursor<Document> cursor = MyDb.collection.find().iterator();
+		MongoCursor<Document> cursor = MyServer.collection.find().iterator();
 		try {
 			while (cursor.hasNext()) {
 				Document doc = cursor.next();
 				System.out.println("HAHA " + doc.toString());
-				MyDb.collection.deleteOne(doc);
+				MyServer.collection.deleteOne(doc);
 			}
 		} finally {
 			cursor.close();
 		}
 		
-		MongoCursor<Document> cursorChat = MyDb.chatCollection.find().iterator();
+		MongoCursor<Document> cursorChat = MyServer.chatCollection.find().iterator();
 		try {
 			while (cursorChat.hasNext()) {
 				Document doc = cursorChat.next();
 				System.out.println("HAHA " + doc.toString());
-				MyDb.chatCollection.deleteOne(doc);
+				MyServer.chatCollection.deleteOne(doc);
 			}
 		} finally {
 			cursorChat.close();

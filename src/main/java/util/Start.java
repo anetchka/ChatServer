@@ -11,13 +11,13 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.UpdateResult;
 
-import database.MyDb;
+import serverChat.MyServer;
 
 public class Start {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		MyDb db = new MyDb();
+		MyServer db = new MyServer();
 		db.registerUser("Ana", "121");
 		Bson filter = Filters.eq(Config.USERNAME_KEY, "Ana");
 	//	System.out.println("1122 " + MyDb.collection.find(filter).first());

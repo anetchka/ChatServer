@@ -1,4 +1,4 @@
-package database;
+package serverChat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,7 +18,7 @@ import com.mongodb.client.model.Filters;
 
 import util.Config;
 
-public class MyDb {
+public class MyServer {
 	// mongo CLient
 	public static MongoClient mongoClient;
 	// database
@@ -27,7 +27,7 @@ public class MyDb {
 	public static MongoCollection<Document> collection;
 	public static MongoCollection<Document> chatCollection;
 
-	public MyDb() {
+	public MyServer() {
 		// connect to mongo
 		mongoClient = new MongoClient("localhost", 27017);
 		// create a database
