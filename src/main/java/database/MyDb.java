@@ -2,6 +2,7 @@ package database;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.print.Doc;
@@ -24,6 +25,7 @@ public class MyDb {
 	public static MongoDatabase db;
 	// collection for the chatServer
 	public static MongoCollection<Document> collection;
+	public static MongoCollection<Document> chatCollection;
 
 	public MyDb() {
 		// connect to mongo
@@ -32,6 +34,8 @@ public class MyDb {
 		db = mongoClient.getDatabase("chatDB");
 		// create collection for the chatServer
 		collection = db.getCollection("users");
+		chatCollection = db.getCollection("chats");
+
 	}
 
 	public boolean registerUser(String username, String password) {
@@ -47,6 +51,8 @@ public class MyDb {
 		Document newUser = new Document();
 		newUser.append(Config.USERNAME_KEY, username);
 		newUser.append(Config.PASSWORD_KEY, password);
+		newUser.append(Config.USER_STATUS_KEY, "");
+		newUser.append(Config.USER_CHAT_KEY, new ArrayList<String>());
 		collection.insertOne(newUser);
 		// mongoClient.fsync(false);
 	}
@@ -69,11 +75,11 @@ public class MyDb {
 		} else {
 			Document myDoc = findUserByName(username);
 			if (myDoc.get(Config.PASSWORD_KEY).equals(password)) {
-				MyDb.collection.updateOne(Filters.eq(Config.USERNAME_KEY, username),
+				collection.updateOne(Filters.eq(Config.USERNAME_KEY, username),
 						new Document("$set", new Document(Config.USER_STATUS_KEY, Config.USER_STATUS_ACTIVE_VALUE)));
 				return true;
 			} else {
-				MyDb.collection.updateOne(Filters.eq(Config.USERNAME_KEY, username),
+				collection.updateOne(Filters.eq(Config.USERNAME_KEY, username),
 						new Document("$set", new Document(Config.USER_STATUS_KEY, Config.USER_STATUS_OFFLINE_VALUE)));
 				return false;
 			}
@@ -81,11 +87,12 @@ public class MyDb {
 	}
 
 	public void findAndUpdate(String username, String newKey, String newValue, boolean isList) {
+
 		if (isList) {
-			MyDb.collection.updateOne(Filters.eq(Config.USERNAME_KEY, username),
+			collection.updateOne(Filters.eq(Config.USERNAME_KEY, username),
 					new Document("$set", new Document(newKey, Arrays.asList(newValue))));
 		} else {
-			MyDb.collection.updateOne(Filters.eq(Config.USERNAME_KEY, username),
+			collection.updateOne(Filters.eq(Config.USERNAME_KEY, username),
 					new Document("$set", new Document(newKey, newValue)));
 		}
 	}
@@ -108,67 +115,121 @@ public class MyDb {
 		if (doc == null) {
 			return;
 		}
+		Document chatDocument = chatCollection.find(Filters.eq(Config.USER_CHAT_KEY, chatName)).first();
+		if (chatDocument != null) {
+			return;
+		}
 		// if chat doesn't exist i the user profile
 		if (!isChatInTheList(userName, chatName)) {
 			// create a new chat
 			Document oneChat = new Document();
-			oneChat.append(Config.USER_CHAT_NAME_KEY, chatName);
-			oneChat.append(Config.USER_ADMIN_KEY, Config.USER_IS_ADMIN_VALUE);
+			oneChat.append(Config.CHAT_NAME_KEY, chatName);
+			oneChat.append(Config.CHAT_ADMIN_KEY, userName);
 			// put user as a member of the chat
 			ArrayList<String> memberList = new ArrayList<String>();
 			memberList.add(userName);
-			oneChat.append(Config.USER_MEMBERS_KEY, memberList);
-			oneChat.append(Config.USER_MESSEGES_KEY, new Document());
-			// if the chat key is not in user's profile
-			if (!doc.containsKey(Config.USER_CHAT_KEY)) {
-				// create chats list
-				ArrayList<Document> chats = new ArrayList<Document>();
-				// add oneChat to chats
-				chats.add(oneChat);
-				MyDb.collection.updateOne(Filters.eq(Config.USERNAME_KEY, userName),
-						new Document("$set", new Document(Config.USER_CHAT_KEY, chats)));
-			} else {
-				System.out.println("Chat exists");
-				// get a list of chats
-				ArrayList<Document> chats = (ArrayList<Document>) doc.get(Config.USER_CHAT_KEY);
-				chats.add(oneChat);
-				MyDb.collection.updateOne(Filters.eq(Config.USERNAME_KEY, userName),
-						new Document("$set", new Document(Config.USER_CHAT_KEY, chats)));
-			}
+			oneChat.append(Config.CHAT_MEMBERS_KEY, memberList);
+			oneChat.append(Config.CHAT_MESSAGES_KEY, new ArrayList<Document>());
+			// add chat to chat collection
+			chatCollection.insertOne(oneChat);
+
+			// get a list of chats from user's profile
+			ArrayList<String> chats = (ArrayList<String>) findUserByName(userName).get(Config.USER_CHAT_KEY);
+			// add oneChat to chats
+			chats.add(chatName);
+			collection.updateOne(Filters.eq(Config.USERNAME_KEY, userName),
+					new Document("$set", new Document(Config.USER_CHAT_KEY, chats)));
 		}
 	}
 
 	public boolean isChatInTheList(String userName, String chatName) {
 		Document doc = findUserByName(userName);
-		// if the chat key doesn't exist in the users profile
-		// then he has no chats
-		if (!doc.containsKey(Config.USER_CHAT_KEY)) {
+		if (doc == null) {
 			return false;
-		} else {
-			ArrayList<Document> chats = (ArrayList<Document>) doc.get(Config.USER_CHAT_KEY);
-			// check if chat exist in the list
-			for (Document oneChat : chats) {
-				String existingChatName = oneChat.getString(Config.USER_CHAT_NAME_KEY);
-				if (existingChatName.equals(chatName)) {
-					return true;
-				}
+		}
+		// if the chat key doesn't exist in the users profile
+		ArrayList<String> chats = (ArrayList<String>) doc.get(Config.USER_CHAT_KEY);
+		// check if chat exist in the list
+		for (String oneChat : chats) {
+			if (oneChat.equals(chatName)) {
+				return true;
 			}
 		}
 		return false;
 	}
 
 	public boolean isAdmin(String userName, String chatName) {
-		Document userProfile = findUserByName(userName);
+		Document userProfile = chatCollection.find(Filters.eq(Config.CHAT_NAME_KEY, chatName)).first();
 		if (userProfile == null) {
 			return false;
 		}
-		ArrayList<Document> chats = (ArrayList<Document>) userProfile.get(Config.USER_CHAT_KEY);
-		for (Document oneChat : chats) {
-			String existingChatName = oneChat.getString(Config.USER_CHAT_NAME_KEY);
-			if (existingChatName.equals(chatName)) {
-				return oneChat.getBoolean(Config.USER_ADMIN_KEY);
+		ArrayList<String> chatMembers = (ArrayList<String>) userProfile.get(Config.CHAT_MEMBERS_KEY);
+		return chatMembers.contains(userName) ? true : false;
+	}
+
+	public void sendMessage(String username, String chatname, String message) {
+		Document userProfile = findUserByName(username);
+		if (userProfile == null) {
+			return;
+		}
+		ArrayList<String> chats = (ArrayList<String>) userProfile.get(Config.USER_CHAT_KEY);
+		if (chats == null) {
+			return;
+		}
+		for (String oneChat : chats) {
+			if (oneChat.equals(chatname)) {
+				Document oneMessage = createMessage(username, chatname, message);
+				Document chat = chatCollection.find(Filters.eq(Config.CHAT_NAME_KEY, chatname)).first();
+				ArrayList<Document> messages = (ArrayList<Document>) chat.get(Config.CHAT_MESSAGES_KEY);
+				messages.add(oneMessage);
+				chatCollection.updateOne(Filters.eq(Config.CHAT_NAME_KEY, chatname),
+						new Document("$set", new Document(Config.CHAT_MESSAGES_KEY, messages)));
 			}
 		}
+	}
+
+	public Document createMessage(String username, String chatname, String message) {
+		Document userProfile = findUserByName(username);
+		if (userProfile == null) {
+			return null;
+		}
+		ArrayList<String> chats = (ArrayList<String>) userProfile.get(Config.USER_CHAT_KEY);
+		if (chats == null) {
+			return null;
+		}
+		for (String oneChat : chats) {
+			if (oneChat.equals(chatname)) {
+				// create one Document for message
+				Document oneMessage = new Document();
+				oneMessage.append(Config.MESSAGE_TEXT_KEY, message);
+				oneMessage.append(Config.MESSAGE_FROM_KEY, username);
+				oneMessage.append(Config.MESSAGE_DATE_KEY, new Date().toString());
+				return oneMessage;
+			}
+		}
+		return null;
+	}
+
+	public boolean isMessageInTheHistory(String username, String chatname, String message) {
+		Document userProfile = findUserByName(username);
+		if (userProfile == null) {
+			return false;
+		}
+		ArrayList<String> chats = (ArrayList<String>) userProfile.get(Config.USER_CHAT_KEY);
+		if (chats == null) {
+			return false;
+		}
+		for (String oneChat : chats) {
+			if (oneChat.equals(chatname)) {
+				Document chat = chatCollection.find(Filters.eq(Config.CHAT_NAME_KEY, chatname)).first();
+				ArrayList<Document> messages = (ArrayList<Document>) chat.get(Config.CHAT_MESSAGES_KEY);
+				for (Document oneMessage : messages) {
+					String textFromChat = (String)oneMessage.get(Config.MESSAGE_TEXT_KEY);
+					return textFromChat.equals(message);
+				}
+			}
+		}
+		
 		return false;
 	}
 }

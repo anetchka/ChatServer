@@ -21,23 +21,22 @@ Feature: The user sends a message
   I want to use this template for my feature file
 
   @First
-  Scenario Outline: Message is successfully sent
-    Given the username <username> has chat <chatname>
-    When the user <username> sends message <message> to the chat <chatname>
-    Then the message <message> is added to username's <username> chat <chatname> history
-    And the message<message> is sent successfully to chat <chatname> of user <username>
-    
-        Examples: 
-      | username  | chatname              | message      |
-      | "JohnDoe" | "SemesterColsing"     | "Let's meet" |
-    
-
-  @Last
-  Scenario Outline: Message sending failed
+	Scenario Outline: Message sending failed
     Given the username <username> doesn't have chat <chatname>
     When the user <username> sends message <message> to the chat <chatname>
     Then the message<message> is failed to be sent to chat <chatname> of user <username>
 
     Examples: 
+      | username  | chatname              | message      |
+      | "JohnDoe" | "SemesterColsing"     | "Let's meet" |
+    
+
+  @Last
+  Scenario Outline: Message is successfully sent
+    Given the username <username> has chat <chatname>
+    When the user <username> sends message <message> to the chat <chatname>
+    Then the message <message> is added to username's <username> chat <chatname> history
+    
+        Examples: 
       | username  | chatname              | message      |
       | "JohnDoe" | "SemesterColsing"     | "Let's meet" |

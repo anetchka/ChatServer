@@ -7,6 +7,7 @@ import java.util.List;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
+import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.UpdateResult;
 
@@ -19,7 +20,7 @@ public class Start {
 		MyDb db = new MyDb();
 		db.registerUser("Ana", "121");
 		Bson filter = Filters.eq(Config.USERNAME_KEY, "Ana");
-		System.out.println("1122 " + MyDb.collection.find(filter).first());
+	//	System.out.println("1122 " + MyDb.collection.find(filter).first());
 		
 
 		
@@ -54,12 +55,22 @@ public class Start {
 		*/
 		
 		db.createChat("Ana", "AAAA");
-		System.out.println(db.isChatInTheList("Ana", "AAAA"));
-		db.createChat("Ana", "AAAA");
 		db.createChat("Ana", "CCC");
-		db.createChat("Ana", "DDD");
+		db.createChat("Ana", "AAAA");
+		System.out.println(db.isAdmin("Ana", "AAAA"));
+		//System.out.println(db.isChatInTheList("Ana", "AAAA"));
+		//db.createChat("Ana", "AAAA");
+		//db.createChat("Ana", "CCC");
+		//db.createChat("Ana", "DDD");
 		
-		System.out.println(MyDb.collection.find(filter).first());
+	//	System.out.println(MyDb.collection.find(filter).first());
+		
+		db.createMessage("Ana", "AAAA", "Hello World");
+		db.createMessage("Ana", "AAAA", "WWERTZUI");
+		db.sendMessage("Ana", "AAAA", "WWERTZUI");
+		System.out.println(db.isMessageInTheHistory("Ana", "AAAA", "WWERUI"));
+		//Bson ff = Filters.and(Filters.eq(Config.USER_CHAT_KEY),Filters.eq(Config.USER_CHAT_NAME_KEY, "AAAA"), Filters.eq(Config.USER_MESSAGES_KEY, ""));
+		//MyDb.collection.updateOne(ff, new Document("$set", new Document(Config.MESSAGE_TEXT_KEY, "Hello World")));
 		
 	}
 }
